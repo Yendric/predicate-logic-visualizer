@@ -3,7 +3,7 @@
 ![Issues](https://img.shields.io/github/issues/Yendric/predicate-logic-visualizer)
 
 > [!WARNING]
-> This application has not been tested for correctness. There might be unsuppored language constructs, mistakes against order of operations...
+> This application has not been tested for correctness. There might be unsupported language constructs, mistakes against order of operations...
 
 A small Rust app that visualizes the abstract syntax tree for a given predicate logic formula.
 
