@@ -3,48 +3,6 @@ use std::fmt::Display;
 
 use super::lexer::{Token, TokenType};
 
-impl Clone for Expression {
-    fn clone(&self) -> Self {
-        match self {
-            Expression::Predicate {
-                identifier,
-                arguments,
-            } => Expression::Predicate {
-                identifier: identifier.clone(),
-                arguments: arguments.clone(),
-            },
-            Expression::Variable { identifier } => Expression::Variable {
-                identifier: identifier.clone(),
-            },
-            Expression::Quantifier {
-                operator,
-                variable,
-                formula,
-            } => Expression::Quantifier {
-                operator: operator.clone(),
-                variable: variable.clone(),
-                formula: formula.clone(),
-            },
-            Expression::Binary {
-                left,
-                operator,
-                right,
-            } => Expression::Binary {
-                left: left.clone(),
-                operator: operator.clone(),
-                right: right.clone(),
-            },
-            Expression::Unary {
-                operator,
-                expression,
-            } => Expression::Unary {
-                operator: operator.clone(),
-                expression: expression.clone(),
-            },
-        }
-    }
-}
-
 #[derive(Debug)]
 pub enum Expression {
     Predicate {
@@ -70,7 +28,7 @@ pub enum Expression {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum QuantifyingOperator {
     ForAll,
     Exists,
@@ -87,17 +45,7 @@ impl Display for QuantifyingOperator {
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum BinaryOperator {
-    Conjunction,
-    Disjunction,
-    Implication,
-    Iff,
-    Equals,
-    NotEquals,
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum UnaryOperator {
     Not,
 }
@@ -117,6 +65,16 @@ impl Display for UnaryOperator {
  *                                                  6      5    4       3       2               
  * Non binary operators are parsed seperately and hence don't need a number to represent their precedence.
 */
+#[derive(Debug)]
+pub enum BinaryOperator {
+    Conjunction,
+    Disjunction,
+    Implication,
+    Iff,
+    Equals,
+    NotEquals,
+}
+
 impl BinaryOperator {
     fn precedence(&self) -> u8 {
         match self {

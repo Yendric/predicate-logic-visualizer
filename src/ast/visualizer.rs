@@ -2,10 +2,7 @@ use super::parser::Expression;
 use id_tree::{InsertBehavior, Node, NodeId, Tree, TreeBuilder};
 use id_tree_layout::{Layouter, Visualize};
 
-pub struct Visualizer {
-    expression: Expression,
-    tree: Tree<TreeNode>,
-}
+pub struct Visualizer {}
 
 struct TreeNode {
     value: String,
@@ -18,25 +15,16 @@ impl Visualize for TreeNode {
 }
 
 impl Visualizer {
-    pub fn new(expression: Expression) -> Self {
-        Self {
-            expression,
-            tree: TreeBuilder::new().build(),
-        }
-    }
-
-    pub fn visualize(&mut self) {
-        self.build_tree();
-
-        Layouter::new(&self.tree)
+    pub fn visualize(expression: &Expression) {
+        Layouter::new(&Visualizer::build_tree(expression))
             .with_file_path(std::path::Path::new("out.svg"))
             .write()
             .expect("Failed writing layout")
     }
 
-    fn build_tree(&mut self) {
-        let root = self
-            .tree
+    fn build_tree(expression: &Expression) -> Tree<TreeNode> {
+        let mut tree = TreeBuilder::new().build();
+        let root = tree
             .insert(
                 Node::new(TreeNode {
                     value: "Formula".to_string(),
@@ -45,13 +33,15 @@ impl Visualizer {
             )
             .unwrap();
 
-        self.insert_expression(&self.expression.clone(), &root);
+        Visualizer::insert_expression(&mut tree, expression, &root);
+
+        tree
     }
 
-    fn insert_expression(&mut self, expression: &Expression, parent: &NodeId) -> () {
+    fn insert_expression(tree: &mut Tree<TreeNode>, expression: &Expression, parent: &NodeId) -> () {
         match expression {
             Expression::Variable { identifier } => {
-                self.tree
+                tree
                     .insert(
                         Node::new(TreeNode {
                             value: identifier.clone(),
@@ -65,8 +55,7 @@ impl Visualizer {
                 ref operator,
                 ref right,
             } => {
-                let branch = self
-                    .tree
+                let branch = tree
                     .insert(
                         Node::new(TreeNode {
                             value: format!("{}", operator),
@@ -75,15 +64,14 @@ impl Visualizer {
                     )
                     .unwrap();
 
-                self.insert_expression(left, &branch);
-                self.insert_expression(right, &branch);
+                Visualizer::insert_expression(tree, left, &branch);
+                Visualizer::insert_expression(tree, right, &branch);
             }
             Expression::Unary {
                 ref operator,
                 ref expression,
             } => {
-                let branch = self
-                    .tree
+                let branch = tree
                     .insert(
                         Node::new(TreeNode {
                             value: format!("{}", operator),
@@ -91,15 +79,13 @@ impl Visualizer {
                         InsertBehavior::UnderNode(&parent),
                     )
                     .unwrap();
-                self.insert_expression(expression, &branch);
+                Visualizer::insert_expression(tree, expression, &branch);
             }
             Expression::Predicate {
                 identifier,
                 arguments,
             } => {
-                let branch = self
-                    .tree
-                    .insert(
+                let branch = tree.insert(
                         Node::new(TreeNode {
                             value: identifier.clone(),
                         }),
@@ -108,8 +94,7 @@ impl Visualizer {
                     .unwrap();
 
                 for argument in arguments {
-                    self.tree
-                        .insert(
+                    tree.insert(
                             Node::new(TreeNode {
                                 value: match argument {
                                     Expression::Variable { identifier } => identifier.clone(),
@@ -126,9 +111,7 @@ impl Visualizer {
                 variable,
                 formula,
             } => {
-                let branch = self
-                    .tree
-                    .insert(
+                let branch = tree.insert(
                         Node::new(TreeNode {
                             value: format!("{}{}", operator, variable),
                         }),
@@ -136,7 +119,7 @@ impl Visualizer {
                     )
                     .unwrap();
 
-                self.insert_expression(formula, &branch);
+                Visualizer::insert_expression(tree, formula, &branch);
             }
         }
     }

@@ -13,6 +13,5 @@ fn main() {
     let mut lexer = ast::lexer::Lexer::new(&formula);
     let mut parser = ast::parser::Parser::new(lexer.tokenize());
     let expression = parser.parse().expect("Error parsing formula.");
-    let mut visualizer = ast::visualizer::Visualizer::new(expression);
-    visualizer.visualize();
+    ast::visualizer::Visualizer::visualize(&expression);
 }
