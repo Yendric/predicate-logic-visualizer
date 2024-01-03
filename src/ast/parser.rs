@@ -126,7 +126,7 @@ impl Parser {
 
         while let Some(operator) = self.peek_binary_operator() {
             let operator_precedence = operator.precedence();
-            if operator_precedence <= precedence {
+            if operator_precedence < precedence {
                 break;
             }
 
