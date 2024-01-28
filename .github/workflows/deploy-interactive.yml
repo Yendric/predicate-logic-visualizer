@@ -19,6 +19,7 @@ jobs:
         run: |
           rustup target add wasm32-wasi
           cargo build --target "wasm32-wasi" --lib --release
+          mkdir interactive/public
           cp target/wasm32-wasi/release/predicate_logic_visualizer.wasm interactive/public/predicate_logic_visualizer.wasm
           cd interactive
           pnpm install
