@@ -29,6 +29,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: predicate_logic_visualizer
+          projectName: predicate-logic-visualizer
           directory: interactive/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
