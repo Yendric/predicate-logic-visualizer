@@ -36,7 +36,11 @@ pub struct Lexer {
 impl Lexer {
     pub fn new(input: &str) -> Self {
         Self {
-            input: input.to_string(),
+            input: input
+                .to_string()
+                .replace("=>", "⇒")
+                .replace("<=>", "⇔")
+                .replace("~=", "≠"),
             current_pos: 0,
         }
     }
@@ -56,30 +60,23 @@ impl Lexer {
         let c = self.current_char();
 
         if let Some(c) = c {
-            if c.is_alphabetic() {
-                return self.read_identifier();
-            }
-
-            let token_type;
-
-            match c {
-                '∀' => token_type = TokenType::ForAll,
-                '∃' => token_type = TokenType::Exists,
-                '∧' => token_type = TokenType::And,
-                '∨' => token_type = TokenType::Or,
-                '¬' => token_type = TokenType::Not,
-                '⇒' => token_type = TokenType::Implies,
-                '⇔' => token_type = TokenType::Iff,
-                '(' | '{' | '[' => token_type = TokenType::ParenOpen,
-                ')' | '}' | ']' => token_type = TokenType::ParenClose,
-                ',' => token_type = TokenType::Comma,
-                ':' => token_type = TokenType::Colon,
-                '=' => token_type = TokenType::Equals,
-                '≠' => token_type = TokenType::NotEquals,
+            return match c {
+                '∀' | '!' => Some(Token::new(TokenType::ForAll, self.consume())),
+                '∃' | '?' => Some(Token::new(TokenType::Exists, self.consume())),
+                '∧' | '&' => Some(Token::new(TokenType::And, self.consume())),
+                '∨' | '|' => Some(Token::new(TokenType::Or, self.consume())),
+                '¬' | '~' => Some(Token::new(TokenType::Not, self.consume())),
+                '⇒' => Some(Token::new(TokenType::Implies, self.consume())),
+                '⇔' => Some(Token::new(TokenType::Iff, self.consume())),
+                '(' | '{' | '[' => Some(Token::new(TokenType::ParenOpen, self.consume())),
+                ')' | '}' | ']' => Some(Token::new(TokenType::ParenClose, self.consume())),
+                ',' => Some(Token::new(TokenType::Comma, self.consume())),
+                ':' => Some(Token::new(TokenType::Colon, self.consume())),
+                '=' => Some(Token::new(TokenType::Equals, self.consume())),
+                '≠' => Some(Token::new(TokenType::NotEquals, self.consume())),
+                c if c.is_alphanumeric() => self.read_identifier(),
                 _ => panic!("Unexpected character: {}", c),
-            }
-
-            Some(Token::new(token_type, self.consume()))
+            };
         } else {
             None
         }
@@ -101,7 +98,7 @@ impl Lexer {
     fn read_identifier(&mut self) -> Option<Token> {
         let mut string = String::new();
         while let Some(c) = self.current_char() {
-            if !c.is_alphabetic() {
+            if !c.is_alphanumeric() {
                 break;
             }
             string.push_str(&self.consume());
