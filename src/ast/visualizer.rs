@@ -38,22 +38,25 @@ impl Visualizer {
         tree
     }
 
-    fn insert_expression(tree: &mut Tree<TreeNode>, expression: &Expression, parent: &NodeId) -> () {
+    fn insert_expression(
+        tree: &mut Tree<TreeNode>,
+        expression: &Expression,
+        parent: &NodeId,
+    ) -> () {
         match expression {
             Expression::Variable { identifier } => {
-                tree
-                    .insert(
-                        Node::new(TreeNode {
-                            value: identifier.clone(),
-                        }),
-                        InsertBehavior::UnderNode(&parent),
-                    )
-                    .unwrap();
+                tree.insert(
+                    Node::new(TreeNode {
+                        value: identifier.clone(),
+                    }),
+                    InsertBehavior::UnderNode(&parent),
+                )
+                .unwrap();
             }
             Expression::Binary {
-                ref left,
-                ref operator,
-                ref right,
+                left,
+                operator,
+                right,
             } => {
                 let branch = tree
                     .insert(
@@ -85,7 +88,8 @@ impl Visualizer {
                 identifier,
                 arguments,
             } => {
-                let branch = tree.insert(
+                let branch = tree
+                    .insert(
                         Node::new(TreeNode {
                             value: identifier.clone(),
                         }),
@@ -94,16 +98,7 @@ impl Visualizer {
                     .unwrap();
 
                 for argument in arguments {
-                    tree.insert(
-                            Node::new(TreeNode {
-                                value: match argument {
-                                    Expression::Variable { identifier } => identifier.clone(),
-                                    _ => String::new(),
-                                },
-                            }),
-                            InsertBehavior::UnderNode(&branch),
-                        )
-                        .unwrap();
+                    Visualizer::insert_expression(tree, argument, &branch);
                 }
             }
             Expression::Quantifier {
@@ -111,7 +106,8 @@ impl Visualizer {
                 variable,
                 formula,
             } => {
-                let branch = tree.insert(
+                let branch = tree
+                    .insert(
                         Node::new(TreeNode {
                             value: format!("{}{}", operator, variable),
                         }),
