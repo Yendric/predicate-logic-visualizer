@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+rect {
+  display: none;
+}
+
+text {
+  @apply fill-gray-900 dark:fill-gray-100;
+}
+
+line {
+  @apply stroke-gray-900 dark:stroke-gray-100;
+}
+
+#out {
+  display: flex;
+  justify-content: center;
+}
