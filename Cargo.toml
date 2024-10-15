@@ -7,6 +7,4 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-id_tree = "1.8.0"
-id_tree_layout = "2.0.4"
-console_error_panic_hook = "0.1.7"
+wasm-bindgen = "0.2.95"
