@@ -23,4 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-public/predicate_logic_visualizer.wasm
+pkg

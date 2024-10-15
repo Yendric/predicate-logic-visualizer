@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
+import wasm from "vite-plugin-wasm";
 
 export default defineConfig({
-  plugins: [nodePolyfills()],
-  build: {
-    target: "ES2022",
-  },
+    plugins: [wasm()],
+    build: {
+        target: "ES2022",
+    },
 });
