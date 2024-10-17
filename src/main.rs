@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::visualizer::drawable::XmlRenderer;
+use visualizer::renderer::svg_renderer::SvgRenderer;
 
 mod ast;
 mod visualizer;
@@ -17,5 +17,5 @@ fn main() {
     let mut parser = ast::parser::Parser::new(lexer.tokenize());
     let expression = parser.parse().expect("Error parsing formula.");
 
-    println!("{}", XmlRenderer::new(expression).render());
+    println!("{}", SvgRenderer::new(expression).render());
 }

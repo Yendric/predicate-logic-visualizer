@@ -6,6 +6,7 @@ pub struct Node {
     pub text: String,
     pub children: Vec<Node>,
     pub full_width: usize,
+    pub width: usize,
     pub y: usize,
     pub x: usize,
 }
@@ -17,16 +18,21 @@ pub struct Tree {
 impl Tree {
     pub fn from_expression(expression: &Expression) -> Self {
         return Self {
-            root: Node::from_expression(expression, 0, 0),
+            root: Node::from_expression(expression, 0, 0, 0),
         };
     }
 }
 
 impl Node {
-    fn from_expression(expression: &Expression, start_y: usize, start_x: usize) -> Self {
+    fn from_expression(
+        expression: &Expression,
+        start_y: usize,
+        start_x: usize,
+        parent_width: usize,
+    ) -> Self {
         let mut children = vec![];
         let text;
-        let mut full_width = expression.text_width();
+        let mut full_width = parent_width.max(expression.text_width());
         const X_SEPERATION: usize = 20;
         const Y_SEPERATION: usize = 40;
 
@@ -37,11 +43,13 @@ impl Node {
                 right,
             } => {
                 text = format!("{}", operator);
-                let node_1 = Node::from_expression(left, start_y + Y_SEPERATION, start_x);
+                let node_1 =
+                    Node::from_expression(left, start_y + Y_SEPERATION, start_x, full_width);
                 let node_2 = Node::from_expression(
                     right,
                     start_y + Y_SEPERATION,
                     start_x + node_1.full_width + X_SEPERATION,
+                    full_width,
                 );
                 full_width = full_width.max(node_1.full_width + node_2.full_width + X_SEPERATION);
                 children.push(node_1);
@@ -54,8 +62,12 @@ impl Node {
                 text = identifier.clone();
                 let mut width_sum = 0;
                 for arg in arguments {
-                    let node =
-                        Node::from_expression(arg, start_y + Y_SEPERATION, start_x + width_sum);
+                    let node = Node::from_expression(
+                        arg,
+                        start_y + Y_SEPERATION,
+                        start_x + width_sum,
+                        full_width,
+                    );
                     width_sum += node.full_width + X_SEPERATION;
                     children.push(node);
                 }
@@ -68,7 +80,8 @@ impl Node {
                 formula,
             } => {
                 text = format!("{}{}", operator, variable);
-                let node = Node::from_expression(formula, start_y + Y_SEPERATION, start_x);
+                let node =
+                    Node::from_expression(formula, start_y + Y_SEPERATION, start_x, full_width);
                 full_width = full_width.max(node.full_width);
                 children.push(node);
             }
@@ -77,7 +90,8 @@ impl Node {
                 expression,
             } => {
                 text = format!("{}", operator);
-                let node = Node::from_expression(expression, start_y + Y_SEPERATION, start_x);
+                let node =
+                    Node::from_expression(expression, start_y + Y_SEPERATION, start_x, full_width);
                 full_width = full_width.max(node.full_width);
                 children.push(node);
             }
@@ -92,6 +106,7 @@ impl Node {
             y: start_y,
             x: start_x,
             full_width,
+            width: expression.text_width(),
         }
     }
 }
